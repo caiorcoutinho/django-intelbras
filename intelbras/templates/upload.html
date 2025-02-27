@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <section class="intelbras">
+        <div>
+            <h2 style="text-align: center;">Robô Intelbras</h2>
+        </div>
+        <div>
+            <p><strong>Recebe a planilha extraída do CPJ, trata os números de telefone e os devolve em outra planilha.</strong></p>
+            <p>Insira a planilha extraída do CPJ e clique em "Gerar Planilha" para converter.</p>
+            <p>Após a conversão aparecerá um botão para baixar a nova planilha.</p>
+        </div>
+        <div>
+            <form method="post" enctype="multipart/form-data" id="form-data">
+                {% csrf_token %}
+                <div class="sheet-input">
+                    <label for="worksheet">
+                        <i style="vertical-align: middle; cursor: pointer;"><img src="https://cdn-icons-png.flaticon.com/512/1295/1295548.png" alt="ícone de planilha" width="25px"></i>
+                        <span style="font-weight: bold; cursor: pointer;">Enviar planilha</span>
+                    </label>
+                    <input type="file" name="worksheet" id="worksheet">
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center;" class="gerar-planilha"><button type="submit" id="gerar-planilha">Gerar Planilha</button></div>
+            </form>
+            {% if file %}
+                <a id="download" href="{% url 'intelbras' %}?f={{file}}"><div class="download">Baixar</div></a>
+            {% elif error %}
+                <div class="error">{{error}}</div>
+            {% endif %}
+            <div class="success">Planilha baixada com sucesso!</div>
+                
+        </div>
+    
+    
+    
+    </section>
+
+    <script type="text/javascript" defer>
+        var divFileInput = document.body.querySelector('.sheet-input')
+        var fileInput = document.body.querySelector('#worksheet')
+        var gerarPlanilha = document.querySelector('#gerar-planilha')
+        var downloadButton = document.querySelector('#download')
+        var form = document.querySelector('#form-data')
+        var success = document.querySelector('.success')
+        function hideButton() {
+            success.style.visibility = 'hidden'
+            if (fileInput.files.length === 0) {
+                divFileInput.style.display = 'flex'
+                gerarPlanilha.style.visibility = 'hidden'
+            } else {
+                divFileInput.style.display = 'none'
+                gerarPlanilha.style.visibility = 'visible'
+            }
+        }
+        function loadingAlert() {
+            alert('Processando planilha')
+            divFileInput.style.display = 'none'
+            gerarPlanilha.style.visibility = 'hidden'
+
+        }
+        function downloadPage() {
+            if (downloadButton === null) {
+                divFileInput.style.display = 'flex'
+            } else {
+                divFileInput.style.display = 'none'
+            }
+        }
+        function downloadClick() {
+            alert('A planilha foi baixada com sucesso.')
+            window.location.href = "{% url 'intelbras' %}"
+            divFileInput.style.display = 'flex'
+            downloadButton.style.display = 'none'
+            success.style.visibility = 'visible'
+        }
+        window.addEventListener('load', hideButton)
+        window.addEventListener('load', downloadPage)
+        fileInput.addEventListener('change', hideButton)
+        gerarPlanilha.addEventListener('click', loadingAlert)
+        downloadButton.addEventListener('click', downloadClick)
+    </script>
+
+
+    {% endblock %}
+    
